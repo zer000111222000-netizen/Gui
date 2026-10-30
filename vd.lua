@@ -3694,7 +3694,7 @@ local function vdLoadCustomAsset(d, f, g)
 		end
 	end
 	local callSucceeded_4, callResult_4 = pcall(vdGetCustomAsset, f)
-	return callSucceeded_4 and callResult_4 or g
+	return callSucceeded_4 and type(callResult_4) == "string" and callResult_4 ~= "" and callResult_4 or g
 end
 local vdLocalization
 local vdCyrillicLower = { ["А"] = "а", ["Б"] = "б", ["В"] = "в", ["Г"] = "г", ["Д"] = "д", ["Е"] = "е", ["Ё"] = "ё", ["Ж"] = "ж", ["З"] = "з", ["И"] = "и", ["Й"] = "й", ["К"] = "к", ["Л"] = "л", ["М"] = "м", ["Н"] = "н", ["О"] = "о", ["П"] = "п", ["Р"] = "р", ["С"] = "с", ["Т"] = "т", ["У"] = "у", ["Ф"] = "ф", ["Х"] = "х", ["Ц"] = "ц", ["Ч"] = "ч", ["Ш"] = "ш", ["Щ"] = "щ", ["Ъ"] = "ъ", ["Ы"] = "ы", ["Ь"] = "ь", ["Э"] = "э", ["Ю"] = "ю", ["Я"] = "я" }
@@ -12392,7 +12392,7 @@ updateCustomBackground = function()
 		local c = writefile and (readfile and (isfile and vdGetCustomAsset))
 		if c then
 			local callSucceeded_20, callResult_20 = pcall(vdGetCustomAsset, h.LocalFile)
-			if callSucceeded_20 and (callResult_20 and callResult_20 ~= "") then
+			if callSucceeded_20 and type(callResult_20) == "string" and callResult_20 ~= "" then
 				i = callResult_20
 			end
 		end
@@ -13321,7 +13321,7 @@ function resolveIcon(d, f)
 		local h = f .. ("/" .. (d .. ".png"))
 		if isfile(h) then
 			local callSucceeded_21, callResult_21 = pcall(g, h)
-			if callSucceeded_21 and callResult_21 then
+			if callSucceeded_21 and type(callResult_21) == "string" and callResult_21 ~= "" then
 				kc[d] = callResult_21
 				return callResult_21
 			end
@@ -13409,7 +13409,7 @@ function createTab(vdTabName, vdIconAsset, vdDescription, vdExtra)
 				end
 				if isfile(f) then
 					local callSucceeded_22, callResult_22 = pcall(d, f)
-					if callSucceeded_22 and callResult_22 then
+					if callSucceeded_22 and type(callResult_22) == "string" and callResult_22 ~= "" then
 						if vdImageLabel3 and vdImageLabel3.Parent then
 							vdImageLabel3.Image = callResult_22
 						end
@@ -16580,18 +16580,16 @@ local function vdBuildHomeTab()
 		vdUIStroke47.Color = UI.Accent
 		vdUIStroke47.Thickness = 1.2
 		task.spawn(function()
-			if vdSettings.StreamerMode then
-				vdImageLabel9.Image = "rbxassetid://0"
-			else
-				local callSucceeded_30, callResult_30 = pcall(function()
-					return Players:GetUserThumbnailAsync(localPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
-				end)
-				if callSucceeded_30 and callResult_30 then
-					vdImageLabel9.Image = callResult_30
-				else
-					vdImageLabel9.Image = "rbxassetid://0"
-				end
+			if not vdImageLabel9.Parent then
+				return
 			end
+			local vdAvatarImage = "rbxassetid://0"
+			local vdAvatarUserId = localPlayer and localPlayer.UserId
+			if not vdSettings.StreamerMode and type(vdAvatarUserId) == "number" and vdAvatarUserId > 0
+				and vdAvatarUserId < math.huge and vdAvatarUserId % 1 == 0 then
+				vdAvatarImage = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(vdAvatarUserId) .. "&w=100&h=100"
+			end
+			vdImageLabel9.Image = vdAvatarImage
 		end)
 		createSection(tabHome, "Player Statistics", UI.Accent)
 		local vdScrollFrame3 = Instance.new("ScrollingFrame")
